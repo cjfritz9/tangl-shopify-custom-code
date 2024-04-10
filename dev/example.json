@@ -1,0 +1,17 @@
+{
+  "example_shopify_product": {
+    "title": "Example Product",
+    "description": "This is an example product",
+    "images": [{ "key": "value" }, { "key": "value" }, { "key": "value" }],
+    "...other_fields": "...",
+
+    "metafields": {
+      "...other_metafields": "...",
+
+      "architek_health": {
+        "stripe_price_id": "zYwwpxb32anepa3",
+        "stripe_product_id": "nxzP345asiya"
+      }
+    }
+  }
+}

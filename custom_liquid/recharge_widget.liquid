@@ -1,0 +1,47 @@
+<style>
+  .product-custom-liquid {
+    margin: 0;
+  }
+
+  .ah-hidden {
+    display: none !important;
+  }
+</style>
+<script class="margin: 0;">
+  const rcWidgetButtons = document.querySelector('.rc-template__button-group');
+  const variantWidget = document.querySelector('div.sidebar-widget.sidebar-widget--outline')
+
+  if (rcWidgetButtons) {
+    rcWidgetButtons.classList.add('ah-hidden');
+  }
+
+  if (variantWidget) {
+    variantWidget.style.marginBottom = 0;
+  }
+
+  
+  const monthlyPlanInput = document.querySelector('input[value="Monthly"]');
+  const threeMonthPlanInput = document.querySelector('input[value="3-month supply"]');
+  const subscriptionDetailsEle = document.querySelector('div.rc-subscription-details')
+  const otpDetailsEle = document.querySelector('div.one-time-details');
+  
+  const handleSelect = (e) => {
+    if (subscriptionDetailsEle && otpDetailsEle) {
+      if (e.target.value === 'Monthly') {
+        otpDetailsEle.classList.add('ah-hidden')
+        subscriptionDetailsEle.classList.remove('ah-hidden')
+      } else {
+        otpDetailsEle.classList.remove('ah-hidden')
+        subscriptionDetailsEle.classList.add('ah-hidden')
+
+      }
+    }
+  }
+  if (otpDetailsEle) {
+    otpDetailsEle.classList.add('ah-hidden')
+  }
+  if (monthlyPlanInput && threeMonthPlanInput) {
+    monthlyPlanInput.addEventListener('click', handleSelect)
+    threeMonthPlanInput.addEventListener('click', handleSelect)
+  }
+</script>

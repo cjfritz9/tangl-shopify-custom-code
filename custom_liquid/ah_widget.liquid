@@ -1,0 +1,102 @@
+{% comment %} "https://patient.ahco.io/trytangl/signup" {% endcomment %}
+
+
+{% capture 'meta_data' %}
+  {% for variant in product.variants %}
+    {{ variant.id | json }}: { 
+      product_id: {{ variant.metafields.architek_health.stripe_product_id | json }},
+      price_id: {{ variant.metafields.architek_health.stripe_price_id | json }}
+    }
+    {% unless forloop.last %},{% endunless %}
+  {% endfor %}
+{% endcapture %}
+
+<a id="get-started-link" target="_blank">
+  <button id="get-started-button" class="custom-button">GET STARTED</button>
+</a>
+
+<style>
+  .custom-button {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    font-weight: 600;
+    padding: 15px;
+    background-color: #24252F;
+    color: #fff !important;
+    text-decoration: none;
+    border-radius: 100px;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .custom-button:hover {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  }
+</style>
+
+<script>
+  // PROCESSOR ID 
+  const processorId = 1;
+  const stripeData = { {{ meta_data }} };
+  let stripeIds = stripeData[{{ product.selected_or_first_available_variant.id | json }}];
+  const variantForm = document.querySelector('div.product-variants');
+  const getStartedLink = document.querySelector('#get-started-link');
+
+  const setArchitekUrl = () => {
+    if (getStartedLink) {
+      const baseUrl = "https://patient.ahco.io/trytangl/signup?";
+      const searchParams = new URLSearchParams();
+      searchParams.set('processorId', processorId);
+      searchParams.set('productId', stripeIds.product_id);
+      searchParams.set('priceId', stripeIds.price_id);
+      getStartedLink.setAttribute('href', baseUrl + searchParams.toString())
+    }
+  }
+
+  const extractUrlSearchParam = (url, param) => {
+    const queryString = url.slice(url.lastIndexOf('?'));
+    return new URLSearchParams(queryString).get(param);
+  }
+
+  const handleUrlChange = (e) => {
+    if (e?.destination?.url) {
+      const variantId = extractUrlSearchParam(e.destination.url, 'variant');
+      if (variantId) {
+        stripeIds = stripeData[variantId];
+      }
+      setArchitekUrl();
+    }
+  }
+
+  // FALLBACK METHOD: HACKY WAY TO GET THE VARIANT ID AFTER VARIANT SELECTION CHANGE
+  const handleChange = () => {
+    setTimeout(() => {
+      const variantId = extractUrlSearchParam(window.location.href, 'variant')
+      if (variantId) {
+        stripeIds = stripeData[variantId];
+      }
+      setArchitekUrl();
+    }, 100);
+  }
+
+  // MODERN BROWSER URL LISTENER
+  if (window && window.navigation) {
+    window.navigation.addEventListener('navigate', handleUrlChange);
+
+  // LESS MODERN BROWSER URL LISTENER
+  } else if (window) {
+    window.addEventListener('locationchange', handleUrlChange);
+
+  // HACKY FALLBACK METHOD
+  } else if (variantForm) {
+    if (variantForm) {
+      const formInputs = variantForm.querySelectorAll('input.product-variant__input.product-variant-value');
+
+      if (formInputs) {
+        [...formInputs].map((ele) => ele.addEventListener('change', handleChange));
+      }
+    }
+  }
+
+  setArchitekUrl();
+</script>

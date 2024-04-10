@@ -1,5 +1,3 @@
-document.getElementById('id').addEventListener('ended');
-
 window.navigation.addEventListener('navigate', (e) =>
   console.log({ 'window.navigation.navigate': e })
 );

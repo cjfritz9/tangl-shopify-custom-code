@@ -1,6 +1,8 @@
-{% comment %} "https://patient.ahco.io/trytangl/signup" {% endcomment %}
-
-
+{% comment %} 
+  Using liquid to get metadata server-side, then construct a dictionary
+  where the key is the variantId and the value is an object containing 
+  both productId and priceId with their respective values.
+{% endcomment %}
 {% capture 'meta_data' %}
   {% for variant in product.variants %}
     {{ variant.id | json }}: { 
@@ -37,11 +39,15 @@
 <script>
   // PROCESSOR ID 
   const processorId = 1;
+  // Assigning the liquid code of IDs above to a javascript object
   const stripeData = { {{ meta_data }} };
+  // Assuming no variantId upon first loading the page, assign the variantId
+  // of the currently selected or first available variant of the product
   let stripeIds = stripeData[{{ product.selected_or_first_available_variant.id | json }}];
   const variantForm = document.querySelector('div.product-variants');
   const getStartedLink = document.querySelector('#get-started-link');
 
+  // handle initializing and updating the href
   const setArchitekUrl = () => {
     if (getStartedLink) {
       const baseUrl = "https://patient.ahco.io/trytangl/signup?";
@@ -53,11 +59,13 @@
     }
   }
 
+  // helper to get a param from a url
   const extractUrlSearchParam = (url, param) => {
     const queryString = url.slice(url.lastIndexOf('?'));
     return new URLSearchParams(queryString).get(param);
   }
 
+  // handle getting the updated variantId and setting the updated stripe IDs
   const handleUrlChange = (e) => {
     if (e?.destination?.url) {
       const variantId = extractUrlSearchParam(e.destination.url, 'variant');
@@ -79,11 +87,13 @@
     }, 100);
   }
 
-  // MODERN BROWSER URL LISTENER
+  // Experimental, used in newer versions of Chrome/Edge: 
+  // https://developer.mozilla.org/en-US/docs/Web/API/Window/navigation#browser_compatibility
   if (window && window.navigation) {
     window.navigation.addEventListener('navigate', handleUrlChange);
 
-  // LESS MODERN BROWSER URL LISTENER
+  // I couldn't find documentation for this, but it did work - I think I
+  // found this event on a stackoverflow thread
   } else if (window) {
     window.addEventListener('locationchange', handleUrlChange);
 

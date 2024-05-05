@@ -90,13 +90,9 @@
   // https://developer.mozilla.org/en-US/docs/Web/API/Window/navigation#browser_compatibility
   if (window && window.navigation) {
     window.navigation.addEventListener('navigate', handleUrlChange);
-
-  // I couldn't find documentation for this, but it did work - I think I
-  // found this event on a stackoverflow thread
   } else if (window) {
     window.addEventListener('locationchange', handleUrlChange);
-
-  // HACKY FALLBACK METHOD
+  // For outdated browsers. Worked in 100% of testing, but I don't like it!
   } else if (variantForm) {
     if (variantForm) {
       const formInputs = variantForm.querySelectorAll('input.product-variant__input.product-variant-value');
